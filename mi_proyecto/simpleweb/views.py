@@ -1,9 +1,8 @@
 from django.shortcuts import render,redirect
- 
 from django.http import HttpResponse
 # Create your views here.
 import mysql.connector as mcdb
-conn = mcdb.connect(host="localhost", user="root", passwd="", database='db_ecom_stock')
+conn = mcdb.connect(host="db", user="root", passwd="12345678", database='Prueba',port=3306)
 print('Successfully connected to database')
 cur = conn.cursor()
 
@@ -12,7 +11,7 @@ def home(request):
 
 
 def categorylisting(request):
-    cur.execute("SELECT * FROM `tb_category`")
+    cur.execute("SELECT * FROM tb_category")
     data = cur.fetchall()
     #return list(data)
     print(list(data))
@@ -23,23 +22,23 @@ def categorycreate(request):
     return render(request, 'add.html')   
 
 
+
 def categoryaddprocess(request):
     if request.method == 'POST':
         print(request.POST)
         catname = request.POST['txt1']
-        cur.execute("INSERT INTO `tb_category`(`category_name`) VALUES ('{}')".format(catname))
+        cur.execute("INSERT INTO tb_category(category_name,is_deleted) VALUES ('{}',{})".format(catname,12))
         conn.commit()
         return redirect(categorycreate) 
     else:
         return redirect(categorycreate)
-
-
+    
 def categorydelete(request,id):
      
     #id = request.GET['id']
     #id = User.objects.get(id=id)
     print(id)
-    cur.execute("delete from `tb_category` where `category_id` = {}".format(id))
+    cur.execute("delete from tb_category where category_id = {}".format(id))
     conn.commit()
     return redirect(categorylisting) 
 
@@ -47,7 +46,7 @@ def categorydelete(request,id):
 def categoryedit(request,id):
      
     print(id)
-    cur.execute("select * from `tb_category` where `category_id` = {}".format(id))
+    cur.execute("select * from tb_category where category_id = {}".format(id))
     data = cur.fetchone()
     #return list(data)
     print(list(data))
@@ -59,7 +58,7 @@ def categoryupdate(request):
         print(request.POST)
         catid = request.POST['txt1']
         catname = request.POST['txt2']
-        cur.execute("update `tb_category` set `category_name` ='{}' where `category_id`='{}'".format(catname,catid))
+        cur.execute("update tb_category set category_name ='{}' where category_id='{}'".format(catname,catid))
         conn.commit()
         return redirect(categorylisting) 
     else:
